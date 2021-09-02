@@ -14,7 +14,7 @@
                     return;
                 }
 
-                $(element).after($compile('<div class="cp-keyboard-container"><cp-keyboard model="' + attrs.ngModel + '" type="' + (attrs.cpKeyboard || attrs.type) + '" enter="' + attrs.enter + '"></cp-keyboard></div>')(ngModelCtrl.$$scope));
+                $(element).after($compile('<div class="cp-keyboard-container"><cp-keyboard custom-rows="' + attrs.customRows + '" model="' + attrs.ngModel + '" type="' + (attrs.cpKeyboard || attrs.type) + '" enter="' + attrs.enter + '"></cp-keyboard></div>')(ngModelCtrl.$$scope));
 
                 $(element).parent().css("position", "relative");
 
@@ -34,7 +34,8 @@
             scope: {
                 model: '=',
                 enter: '=',
-                type: '='
+                type: '=',
+                customRows: '='
             },
             link: function link(scope, elements, attrs, Ctrl) {
                 var element = elements[0];
@@ -786,6 +787,10 @@
                     }
                 }
 
+                if (scope.customRows != undefined) {
+                    scope.keyboard.rows = scope.keyboard.rows.concat(scope.customRows);
+                }
+
                 scope.trust = function (html) {
                     return $sce.trustAsHtml(html);
                 };
@@ -793,6 +798,10 @@
                 scope.keyboardAction = function ($event, _action, val) {
 
                     $event.preventDefault();
+
+                    if (_action instanceof Function) {
+                        _action();
+                    }
 
                     var action = "addKey";
 
@@ -817,6 +826,7 @@
                                 break;
                             case "hide":
                                 $(element).parent().removeClass("cp-in");
+                                $("input:focus").blur();
                                 break;
                             default:
                                 break;
@@ -831,6 +841,13 @@
                 };
             },
             template: '<div class="cp-row" ng-repeat="cpk in keyboard.rows" ng-class="cpk.class"><button type="button" class="cp-button" ng-repeat="_c in cpk.chars" ng-class="_c.class" ng-bind-html="trust(_c.lowercase.text)" ng-mousedown="keyboardAction($event,_c.action, _c.lowercase.value)"></button></div>'
+        };
+    }]).factory("cpKeyboardService", [function () {
+        return {
+            closeAll: function closeAll() {
+                $(".cp-keyboard-container").removeClass("cp-in");
+                $("input:focus").blur();
+            }
         };
     }]);
 })(angular);
