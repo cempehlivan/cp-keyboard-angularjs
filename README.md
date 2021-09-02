@@ -3,6 +3,8 @@
 
 [Demo](https://cempehlivan.github.io/cp-keyboard-angularjs/example/)
 
+![Demo](https://cempehlivan.github.io/cp-keyboard-angularjs/example/example.png)
+
 Example:
 
     <input type="text" ng-model="foo" cp-keyboard>
